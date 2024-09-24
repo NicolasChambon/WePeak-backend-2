@@ -48,6 +48,14 @@ class Activity
     #[ORM\JoinColumn(nullable: false)]
     private ?User $createdBy = null;
 
+    #[ORM\ManyToOne(inversedBy: 'activities')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Sport $sport = null;
+
+    #[ORM\ManyToOne(inversedBy: 'activities')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Difficulty $difficulty = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -181,6 +189,30 @@ class Activity
     public function setCreatedBy(?User $createdBy): static
     {
         $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getSport(): ?Sport
+    {
+        return $this->sport;
+    }
+
+    public function setSport(?Sport $sport): static
+    {
+        $this->sport = $sport;
+
+        return $this;
+    }
+
+    public function getDifficulty(): ?Difficulty
+    {
+        return $this->difficulty;
+    }
+
+    public function setDifficulty(?Difficulty $difficulty): static
+    {
+        $this->difficulty = $difficulty;
 
         return $this;
     }
