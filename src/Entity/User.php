@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -54,6 +56,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $verificationToken = null;
+
+    #[ORM\OneToMany(targetEntity: Activity::class, mappedBy: 'createdBy', cascade: ['remove'])]
+    private Collection $activitiesCreated;
+
+    public function __construct()
+    {
+        $this->activitiesCreated = new ArrayCollection();
+    }
 
     public function getRoles(): array
     {
@@ -226,6 +236,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setVerificationToken(?string $verificationToken): static
     {
         $this->verificationToken = $verificationToken;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Activity>
+     */
+    public function getActivitiesCreated(): Collection
+    {
+        return $this->activitiesCreated;
+    }
+
+    public function addActivitiesCreated(Activity $activitiesCreated): static
+    {
+        if (!$this->activitiesCreated->contains($activitiesCreated)) {
+            $this->activitiesCreated->add($activitiesCreated);
+            $activitiesCreated->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActivitiesCreated(Activity $activitiesCreated): static
+    {
+        if ($this->activitiesCreated->removeElement($activitiesCreated)) {
+            // set the owning side to null (unless already changed)
+            if ($activitiesCreated->getCreatedBy() === $this) {
+                $activitiesCreated->setCreatedBy(null);
+            }
+        }
 
         return $this;
     }
