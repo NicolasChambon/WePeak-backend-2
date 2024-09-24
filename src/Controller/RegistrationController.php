@@ -2,19 +2,18 @@
 
 namespace App\Controller;
 
-use DateTime;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Util\Json;
+use Error;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Mime\Email;
-use Error;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/users', name: 'api_users_')]
 class RegistrationController extends AbstractController
@@ -57,7 +56,7 @@ class RegistrationController extends AbstractController
                 ->from('nicolas.chambon.dev@gmail.com')
                 ->to($user->getEmail())
                 ->subject('Wepeak - Vérification de votre adresse email')
-                ->text('Cliquez sur ce lien pour vérifier votre adresse email : http://localhost:8000/api/users/verify?token='.$verificationToken);
+                ->text('Cliquez sur ce lien pour vérifier votre adresse email : http://localhost:8000/api/users/verify/'.$verificationToken);
                 
             $mailer->send($email); // Send the email
 
@@ -67,7 +66,36 @@ class RegistrationController extends AbstractController
             ]);
         } catch (Error $e) {
             return $this->json([
-                'message' => 'An error occurred. Please try again later.'
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    #[Route('/verify/{token}', name: 'verify_email', methods: ['GET'])]
+    public function verifyEmail (
+        string $token,
+        EntityManagerInterface $entityManager
+    ): RedirectResponse
+    {
+        try {
+            $user = $entityManager->getRepository(User::class)->findOneBy([
+                'verificationToken' => $token
+            ]);
+            
+            if (!$user) {
+                return $this->json([
+                    'message' => 'User not found.'
+                ], 404);
+            }
+    
+            $user->setIsVerified(true);
+            $user->setVerificationToken(null);
+            $entityManager->flush();
+            
+            return $this->redirect('http://localhost:5173/login/first-time');
+        } catch (Error $e) {
+            return $this->json([
+                'message' => $e->getMessage()
             ], 500);
         }
     }
