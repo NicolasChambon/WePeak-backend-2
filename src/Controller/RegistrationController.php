@@ -18,11 +18,18 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/users', name: 'api_users_')]
 class RegistrationController extends AbstractController
 {
+
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     #[Route('', name: 'register', methods: ['POST'])]
     public function register (
         Request $request, 
         UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $entityManager,
         MailerInterface $mailer
         ): JsonResponse
     {
@@ -48,8 +55,8 @@ class RegistrationController extends AbstractController
             $user->setVerificationToken($verificationToken); // Set the token to the user object
     
             // Save the user object to the database
-            $entityManager->persist($user); // Prepare the user object to be saved
-            $entityManager->flush(); // Save the user object to the database
+            $this->entityManager->persist($user); // Prepare the user object to be saved
+            $this->entityManager->flush(); // Save the user object to the database
     
             // Prepare the email to be sent
             $email = (new Email())
@@ -74,11 +81,10 @@ class RegistrationController extends AbstractController
     #[Route('/verify/{token}', name: 'verify_email', methods: ['GET'])]
     public function verifyEmail (
         string $token,
-        EntityManagerInterface $entityManager
-    ): RedirectResponse
+        ): RedirectResponse
     {
         try {
-            $user = $entityManager->getRepository(User::class)->findOneBy([
+            $user = $this->entityManager->getRepository(User::class)->findOneBy([
                 'verificationToken' => $token
             ]);
             
@@ -90,7 +96,7 @@ class RegistrationController extends AbstractController
     
             $user->setIsVerified(true);
             $user->setVerificationToken(null);
-            $entityManager->flush();
+            $this->entityManager->flush();
             
             return $this->redirect('http://localhost:5173/login/first-time');
         } catch (Error $e) {
