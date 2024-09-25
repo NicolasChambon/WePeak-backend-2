@@ -2,27 +2,28 @@
 
 namespace App\DataFixtures;
 
-use DateTime;
-use Faker\Factory;
-use App\Entity\User;
-use App\Entity\Sport;
-use DateTimeImmutable;
 use App\Entity\Activity;
 use App\Entity\Difficulty;
-use Doctrine\Persistence\ObjectManager;
+use App\Entity\Sport;
+use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
+use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    private UserPasswordHasherInterface $hasher;
 
-    public function __construct(
-        private readonly UserPasswordHasherInterface $hasher
-    ){}
+    public function __construct(UserPasswordHasherInterface $hasher)
+    {
+        $this->hasher = $hasher;
+    }
 
     public function load(ObjectManager $manager): void
     {
-        $this->loadUsers($manager);
+        $this->loadUsers($manager, $this->hasher);
         $this->loadSports($manager);
         $this->loadDifficulties($manager);
         $this->createAndLoadActivities($manager);

@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\ActivityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ActivityRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 class Activity
@@ -12,9 +13,11 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['activity.list'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['activity.list'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -27,6 +30,7 @@ class Activity
     private ?int $groupSize = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['activity.list'])]
     private ?string $city = null;
 
     #[ORM\Column]
@@ -42,6 +46,7 @@ class Activity
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['activity.list'])]
     private ?string $thumbnail = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'activitiesCreated')]
@@ -50,10 +55,12 @@ class Activity
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['activity.list'])]
     private ?Sport $sport = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['activity.list'])]
     private ?Difficulty $difficulty = null;
 
     public function getId(): ?int

@@ -24,7 +24,32 @@ doctrine:
                 alias: App
         controller_resolver:
             auto_mapping: false
-
+        dql:
+            numeric_functions:
+                acos: DoctrineExtensions\Query\Mysql\Acos
+                asin: DoctrineExtensions\Query\Mysql\Asin
+                atan2: DoctrineExtensions\Query\Mysql\Atan2
+                atan: DoctrineExtensions\Query\Mysql\Atan
+                cos: DoctrineExtensions\Query\Mysql\Cos
+                cot: DoctrineExtensions\Query\Mysql\Cot
+                degrees: DoctrineExtensions\Query\Mysql\Degrees
+                radians: DoctrineExtensions\Query\Mysql\Radians
+                sin: DoctrineExtensions\Query\Mysql\Sin
+                tan: DoctrineExtensions\Query\Mysql\Tan
+                conv: DoctrineExtensions\Query\Mysql\Conv
+                crc32: DoctrineExtensions\Query\Mysql\Crc32
+                sign: DoctrineExtensions\Query\Mysql\Sign
+                round: DoctrineExtensions\Query\Mysql\Round
+                rand: DoctrineExtensions\Query\Mysql\Rand
+                pow: DoctrineExtensions\Query\Mysql\Pow
+                exp: DoctrineExtensions\Query\Mysql\Exp
+                ln: DoctrineExtensions\Query\Mysql\Ln
+                log: DoctrineExtensions\Query\Mysql\Log
+                log10: DoctrineExtensions\Query\Mysql\Log10
+                sqrt: DoctrineExtensions\Query\Mysql\Sqrt
+                ceil: DoctrineExtensions\Query\Mysql\Ceil
+                floor: DoctrineExtensions\Query\Mysql\Floor
+                
 when@test:
     doctrine:
         dbal:

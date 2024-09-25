@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\DifficultyRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\DifficultyRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: DifficultyRepository::class)]
 class Difficulty
@@ -16,9 +17,11 @@ class Difficulty
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['activity.list'])]
     private ?string $value = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['activity.list'])]
     private ?string $label = null;
 
     #[ORM\Column]
