@@ -7,6 +7,7 @@ use Faker\Factory;
 use App\Entity\User;
 use App\Entity\Sport;
 use DateTimeImmutable;
+use App\Entity\Activity;
 use App\Entity\Difficulty;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -24,6 +25,7 @@ class AppFixtures extends Fixture
         $this->loadUsers($manager);
         $this->loadSports($manager);
         $this->loadDifficulties($manager);
+        $this->createAndLoadActivities($manager);
     }
 
     private function loadUsers(ObjectManager $manager): void
@@ -31,7 +33,7 @@ class AppFixtures extends Fixture
 
         $faker =  Factory::create('fr_FR');
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             
             $firstName = $faker->firstName();
             $lastName = str_replace(' ', '', $faker->lastName());
@@ -159,82 +161,123 @@ class AppFixtures extends Fixture
         }
     }
 
+    private function createAndLoadActivities(ObjectManager $manager): void
+    {
+        $faker = Factory::create('fr_FR');
+        $users = $manager->getRepository(User::class)->findAll();
+        $sports = $manager->getRepository(Sport::class)->findAll();
+        $difficulties = $manager->getRepository(Difficulty::class)->findAll();
+
+        for ($i = 0; $i < 500; $i++) {
+            $city = array_rand($this->cities);
+            $lat = $this->cities[$city]['latitude'];
+            $lng = $this->cities[$city]['longitude'];
+
+            $activity = new Activity();
+            $activity->setName($faker->sentence(6))
+                ->setDescription($faker->paragraph(3))
+                ->setDate($faker->dateTimeBetween('-1 month', '+1 month'))
+                ->setGroupSize($faker->numberBetween(2, 10))
+                ->setCity($city)
+                ->setLat($lat)
+                ->setLng($lng)
+                ->setCreatedAt(new DateTimeImmutable())
+                ->setCreatedBy($faker->randomElement($users))
+                ->setSport($faker->randomElement($sports))
+                ->setDifficulty($faker->randomElement($difficulties))
+                ->setThumbnail('https://loremflickr.com/320/240/landscape');
+            $manager->persist($activity);
+        }
+        $manager->flush();
+    }
+
     private array $cities = [
-        'Aix-les-Bains' => ['latitude' => 45.6888, 'longitude' => 5.9150],
-        'Ambérieu-en-Bugey' => ['latitude' => 45.9562, 'longitude' => 5.3574],
-        'Anglet' => ['latitude' => 43.4857, 'longitude' => -1.5232],
+        'Albertville' => ['latitude' => 45.6758, 'longitude' => 6.3901],
+        'Allonzier-la-Caille' => ['latitude' => 45.9750, 'longitude' => 6.1206],
+        'Amancy' => ['latitude' => 46.0733, 'longitude' => 6.3339],
         'Annecy' => ['latitude' => 45.8992, 'longitude' => 6.1294],
         'Annecy-le-Vieux' => ['latitude' => 45.9195, 'longitude' => 6.1438],
-        'Annonay' => ['latitude' => 45.2393, 'longitude' => 4.6763],
+        'Annemasse' => ['latitude' => 46.1957, 'longitude' => 6.2366],
+        'Anthy-sur-Léman' => ['latitude' => 46.3533, 'longitude' => 6.4275],
+        'Argonay' => ['latitude' => 45.9380, 'longitude' => 6.1210],
+        'Arthaz-Pont-Notre-Dame' => ['latitude' => 46.1622, 'longitude' => 6.3017],
         'Autun' => ['latitude' => 46.9496, 'longitude' => 4.2983],
-        'Barberaz' => ['latitude' => 45.5736, 'longitude' => 5.9021],
-        'Bayonne' => ['latitude' => 43.4933, 'longitude' => -1.4746],
-        'Belley' => ['latitude' => 45.7550, 'longitude' => 5.6863],
-        'Biarritz' => ['latitude' => 43.4832, 'longitude' => -1.5586],
-        'Boucau' => ['latitude' => 43.5130, 'longitude' => -1.4672],
-        'Bourg-en-Bresse' => ['latitude' => 46.2057, 'longitude' => 5.2258],
-        'Bourgoin-Jallieu' => ['latitude' => 45.5848, 'longitude' => 5.2732],
-        'Capbreton' => ['latitude' => 43.6448, 'longitude' => -1.4370],
-        'Challes-les-Eaux' => ['latitude' => 45.5627, 'longitude' => 5.9718],
-        'Chambéry' => ['latitude' => 45.5645, 'longitude' => 5.9175],
-        'Chambéry-le-Vieux' => ['latitude' => 45.6048, 'longitude' => 5.9181],
-        'Cluny' => ['latitude' => 46.4372, 'longitude' => 4.6591],
-        'Combloux' => ['latitude' => 45.8925, 'longitude' => 6.6461],
-        'Cordon' => ['latitude' => 45.9250, 'longitude' => 6.6199],
-        'Cran-Gevrier' => ['latitude' => 45.9003, 'longitude' => 6.0982],
-        'Crest' => ['latitude' => 44.7273, 'longitude' => 5.0243],
-        'Crémieu' => ['latitude' => 45.7222, 'longitude' => 5.2561],
-        'Croix' => ['latitude' => 50.6782, 'longitude' => 3.1455],
-        'Demi-Quartier' => ['latitude' => 45.8883, 'longitude' => 6.6339],
-        'Domancy' => ['latitude' => 45.8989, 'longitude' => 6.6500],
-        'Epagny' => ['latitude' => 45.9339, 'longitude' => 6.0647],
-        'Grenoble' => ['latitude' => 45.1885, 'longitude' => 5.7245],
-        'Halluin' => ['latitude' => 50.7977, 'longitude' => 3.1333],
-        'Hossegor' => ['latitude' => 43.6631, 'longitude' => -1.4370],
-        'La Madeleine' => ['latitude' => 50.6513, 'longitude' => 3.0664],
-        'La Ravoire' => ['latitude' => 45.5699, 'longitude' => 5.9344],
-        'Labenne' => ['latitude' => 43.5924, 'longitude' => -1.4509],
-        'Lambersart' => ['latitude' => 50.6515, 'longitude' => 3.0178],
-        'Le Bourget-du-Lac' => ['latitude' => 45.6539, 'longitude' => 5.8507],
-        'Le Puy-en-Velay' => ['latitude' => 45.0419, 'longitude' => 3.8831],
-        'Les Houches' => ['latitude' => 45.8934, 'longitude' => 6.7914],
-        'Lille' => ['latitude' => 50.6293, 'longitude' => 3.0573],
-        'Mâcon' => ['latitude' => 46.3069, 'longitude' => 4.8283],
-        'Marcq-en-Barœul' => ['latitude' => 50.6728, 'longitude' => 3.0977],
-        'Megève' => ['latitude' => 45.8576, 'longitude' => 6.6153],
-        'Meythet' => ['latitude' => 45.9183, 'longitude' => 6.1023],
-        'Metz-Tessy' => ['latitude' => 45.9313, 'longitude' => 6.1081],
-        'Montélimar' => ['latitude' => 44.5588, 'longitude' => 4.7495],
-        'Montmélian' => ['latitude' => 45.4870, 'longitude' => 5.9204],
-        'Nyons' => ['latitude' => 44.3592, 'longitude' => 5.1426],
-        'Ondres' => ['latitude' => 43.5595, 'longitude' => -1.4346],
-        'Passy' => ['latitude' => 45.9361, 'longitude' => 6.7006],
-        'Péage-de-Roussillon' => ['latitude' => 45.3778, 'longitude' => 4.7688],
-        'Pérouges' => ['latitude' => 45.9030, 'longitude' => 5.1772],
-        'Poisy' => ['latitude' => 45.9192, 'longitude' => 6.0514],
-        'Pont-de-Vaux' => ['latitude' => 46.4183, 'longitude' => 4.9296],
-        'Pringy' => ['latitude' => 45.9467, 'longitude' => 6.1261],
-        'Quintal' => ['latitude' => 45.8569, 'longitude' => 6.0699],
-        'Roanne' => ['latitude' => 46.0368, 'longitude' => 4.0711],
-        'Romans-sur-Isère' => ['latitude' => 45.0460, 'longitude' => 5.0538],
-        'Roubaix' => ['latitude' => 50.6916, 'longitude' => 3.1746],
-        'Saint-Alban-Leysse' => ['latitude' => 45.5606, 'longitude' => 5.9539],
-        'Saint-Étienne' => ['latitude' => 45.4397, 'longitude' => 4.3872],
-        'Saint-Gervais-les-Bains' => ['latitude' => 45.8919, 'longitude' => 6.7018],
-        'Sallanches' => ['latitude' =>  45.9228, 'longitude' => 6.7015],
-        'Seignosse' => ['latitude' => 43.6923, 'longitude' => -1.3984],
-        'Seynod' => ['latitude' => 45.8796, 'longitude' => 6.0948],
-        'Tarare' => ['latitude' => 45.8947, 'longitude' => 4.4322],
-        'Tarnos' => ['latitude' => 43.5397, 'longitude' => -1.4641],
-        'Tourcoing' => ['latitude' => 50.7235, 'longitude' => 3.1615],
-        'Tournus' => ['latitude' => 46.5703, 'longitude' => 4.9125],
-        'Trévoux' => ['latitude' => 45.9336, 'longitude' => 4.7661],
-        'Valence' => ['latitude' => 44.9334, 'longitude' => 4.8929],
-        'Veyrier-du-Lac' => ['latitude' => 45.8828, 'longitude' => 6.1611],
-        'Vienne' => ['latitude' => 45.5300, 'longitude' => 4.8786],
-        'Villefranche-sur-Mer' => ['latitude' => 43.7034, 'longitude' => 7.3052],
-        'Villefranche-sur-Saône' => ['latitude' => 45.9884, 'longitude' => 4.7216],
-        'Wambrechies' => ['latitude' => 50.6839, 'longitude' => 3.0315],
-        'Wasquehal' => ['latitude' => 50.6677, 'longitude' => 3.1234],
+        'Beaumont' => ['latitude' => 46.1424, 'longitude' => 6.1375],
+        'Bonne' => ['latitude' => 46.1984, 'longitude' => 6.3039],
+        'Bonneville' => ['latitude' => 46.0789, 'longitude' => 6.4083],
+        'Chamonix-Mont-Blanc' => ['latitude' => 45.9237, 'longitude' => 6.8694],
+        'Cran-Gevrier' => ['latitude' => 45.9091, 'longitude' => 6.1068],
+        'Cranves-Sales' => ['latitude' => 46.1871, 'longitude' => 6.2996],
+        'Domancy' => ['latitude' => 45.9181, 'longitude' => 6.6385],
+        'Doussard' => ['latitude' => 45.7771, 'longitude' => 6.2242],
+        'Duingt' => ['latitude' => 45.8310, 'longitude' => 6.2054],
+        'Épagny' => ['latitude' => 45.9384, 'longitude' => 6.0859],
+        'Évian-les-Bains' => ['latitude' => 46.4024, 'longitude' => 6.5932],
+        'Faverges' => ['latitude' => 45.7458, 'longitude' => 6.2924],
+        'Gaillard' => ['latitude' => 46.1884, 'longitude' => 6.2172],
+        'Giez' => ['latitude' => 45.7466, 'longitude' => 6.2383],
+        'Groisy' => ['latitude' => 46.0019, 'longitude' => 6.1536],
+        'La Balme-de-Sillingy' => ['latitude' => 45.9644, 'longitude' => 6.0247],
+        'La Roche-sur-Foron' => ['latitude' => 46.0667, 'longitude' => 6.3146],
+        'Le Grand-Bornand' => ['latitude' => 45.9429, 'longitude' => 6.4278],
+        'Les Contamines-Montjoie' => ['latitude' => 45.8236, 'longitude' => 6.7277],
+        'Les Houches' => ['latitude' => 45.8883, 'longitude' => 6.7982],
+        'Marnaz' => ['latitude' => 46.0637, 'longitude' => 6.5154],
+        'Marcellaz' => ['latitude' => 46.1197, 'longitude' => 6.4215],
+        'Megève' => ['latitude' => 45.8572, 'longitude' => 6.6141],
+        'Menthon-Saint-Bernard' => ['latitude' => 45.8457, 'longitude' => 6.2016],
+        'Meythet' => ['latitude' => 45.9154, 'longitude' => 6.0986],
+        'Morillon' => ['latitude' => 46.0825, 'longitude' => 6.6739],
+        'Passy' => ['latitude' => 45.9249, 'longitude' => 6.7055],
+        'Praz-sur-Arly' => ['latitude' => 45.8323, 'longitude' => 6.5726],
+        'Reignier-Ésery' => ['latitude' => 46.1375, 'longitude' => 6.2539],
+        'Rumilly' => ['latitude' => 45.8527, 'longitude' => 5.9478],
+        'Saint-Gervais-les-Bains' => ['latitude' => 45.8956, 'longitude' => 6.7104],
+        'Saint-Jorioz' => ['latitude' => 45.8297, 'longitude' => 6.1576],
+        'Saint-Jeoire' => ['latitude' => 46.1447, 'longitude' => 6.4736],
+        'Saint-Martin-Bellevue' => ['latitude' => 45.9561, 'longitude' => 6.1377],
+        'Saint-Pierre-en-Faucigny' => ['latitude' => 46.0647, 'longitude' => 6.4321],
+        'Sallanches' => ['latitude' => 45.9450, 'longitude' => 6.6318],
+        'Samoëns' => ['latitude' => 46.0846, 'longitude' => 6.7281],
+        'Seynod' => ['latitude' => 45.8844, 'longitude' => 6.0874],
+        'Talloires' => ['latitude' => 45.8375, 'longitude' => 6.2143],
+        'Taninges' => ['latitude' => 46.1319, 'longitude' => 6.5946],
+        'Thônes' => ['latitude' => 45.8814, 'longitude' => 6.3197],
+        'Thonon-les-Bains' => ['latitude' => 46.3747, 'longitude' => 6.4758],
+        'Ugine' => ['latitude' => 45.7494, 'longitude' => 6.4247],
+        'Vallières-sur-Fier' => ['latitude' => 45.9007, 'longitude' => 5.9656],
+        'Veyrier-du-Lac' => ['latitude' => 45.8769, 'longitude' => 6.1658],
+        'Ville-la-Grand' => ['latitude' => 46.2039, 'longitude' => 6.2564],
+        'Villy-le-Pelloux' => ['latitude' => 45.9687, 'longitude' => 6.1173],
+        'Aime-la-Plagne' => ['latitude' => 45.5558, 'longitude' => 6.6546],
+        'Amancy' => ['latitude' => 46.0733, 'longitude' => 6.3339],
+        'Arâches-la-Frasse' => ['latitude' => 46.0268, 'longitude' => 6.6482],
+        'Ayse' => ['latitude' => 46.0796, 'longitude' => 6.4537],
+        'Beaufort' => ['latitude' => 45.7226, 'longitude' => 6.5696],
+        'Boëge' => ['latitude' => 46.2122, 'longitude' => 6.4665],
+        'Cervens' => ['latitude' => 46.3156, 'longitude' => 6.4823],
+        'Cluses' => ['latitude' => 46.0627, 'longitude' => 6.5755],
+        'Combloux' => ['latitude' => 45.8992, 'longitude' => 6.6241],
+        'Dingy-Saint-Clair' => ['latitude' => 45.9340, 'longitude' => 6.2733],
+        'Entremont' => ['latitude' => 45.9361, 'longitude' => 6.3244],
+        'Flumet' => ['latitude' => 45.8196, 'longitude' => 6.5279],
+        'La Clusaz' => ['latitude' => 45.9058, 'longitude' => 6.4278],
+        'La Tour' => ['latitude' => 46.1781, 'longitude' => 6.4114],
+        'Les Gets' => ['latitude' => 46.1578, 'longitude' => 6.6677],
+        'Magland' => ['latitude' => 46.0173, 'longitude' => 6.6313],
+        'Manigod' => ['latitude' => 45.8583, 'longitude' => 6.3725],
+        'Mieussy' => ['latitude' => 46.1370, 'longitude' => 6.5251],
+        'Mont-Saxonnex' => ['latitude' => 46.0457, 'longitude' => 6.4975],
+        'Morillon' => ['latitude' => 46.0825, 'longitude' => 6.6739],
+        'Nancy-sur-Cluses' => ['latitude' => 46.0279, 'longitude' => 6.6151],
+        'Praz-sur-Arly' => ['latitude' => 45.8323, 'longitude' => 6.5726],
+        'Saint-Gervais-les-Bains' => ['latitude' => 45.8956, 'longitude' => 6.7104],
+        'Saint-Jeoire' => ['latitude' => 46.1447, 'longitude' => 6.4736],
+        'Scionzier' => ['latitude' => 46.0605, 'longitude' => 6.5298],
+        'Serraval' => ['latitude' => 45.8336, 'longitude' => 6.3222],
+        'Sixt-Fer-à-Cheval' => ['latitude' => 46.0656, 'longitude' => 6.7787],
+        'Verchaix' => ['latitude' => 46.0926, 'longitude' => 6.7266],
+        'Viuz-en-Sallaz' => ['latitude' => 46.1454, 'longitude' => 6.4151],
+        'Vougy' => ['latitude' => 46.0565, 'longitude' => 6.5111],
     ];
 }
