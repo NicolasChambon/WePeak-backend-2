@@ -24,6 +24,7 @@ class Activity
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['activity.list'])]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column]
@@ -52,6 +53,10 @@ class Activity
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'activitiesCreated')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $createdBy = null;
+
+    #[ORM\Column(length: 100)]
+    #[Groups(['activity.list'])]
+    private ?string $slug = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
     #[ORM\JoinColumn(nullable: false)]
@@ -220,6 +225,18 @@ class Activity
     public function setDifficulty(?Difficulty $difficulty): static
     {
         $this->difficulty = $difficulty;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
 
         return $this;
     }

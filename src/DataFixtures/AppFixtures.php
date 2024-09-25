@@ -11,14 +11,17 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class AppFixtures extends Fixture
 {
     private UserPasswordHasherInterface $hasher;
+    private SluggerInterface $slugger;
 
-    public function __construct(UserPasswordHasherInterface $hasher)
+    public function __construct(UserPasswordHasherInterface $hasher, SluggerInterface $slugger)
     {
         $this->hasher = $hasher;
+        $this->slugger = $slugger;
     }
 
     public function load(ObjectManager $manager): void
@@ -186,7 +189,8 @@ class AppFixtures extends Fixture
                 ->setCreatedBy($faker->randomElement($users))
                 ->setSport($faker->randomElement($sports))
                 ->setDifficulty($faker->randomElement($difficulties))
-                ->setThumbnail('https://loremflickr.com/320/240/landscape');
+                ->setSlug($this->slugger->slug($activity->getName())->lower())
+                ->setThumbnail('https://loremflickr.com/320/240/mountain');
             $manager->persist($activity);
         }
         $manager->flush();
