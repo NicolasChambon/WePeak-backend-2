@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\PicturesRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PicturesRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PicturesRepository::class)]
 class Pictures
@@ -14,6 +15,7 @@ class Pictures
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['activity.detail'])]
     private ?string $link = null;
 
     #[ORM\Column]

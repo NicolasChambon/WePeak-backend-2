@@ -39,6 +39,7 @@ class AppFixtures extends Fixture
         $this->createAndLoadActivities($manager);
         $this->createAndLoadParticipations($manager);
         $this->createAndLoadPictures($manager);
+        $this->loadAdmin($manager);
     }
 
     private function loadUsers(ObjectManager $manager): void
@@ -69,6 +70,23 @@ class AppFixtures extends Fixture
                 ->setIsVerified(true);
             $manager->persist($user);
         }
+        $manager->flush();
+    }
+
+    private function loadAdmin(ObjectManager $manager): void
+    {
+        $admin = new User();
+        $admin->setPseudo('admin')
+            ->setEmail('nico.chambon@gmail.com')
+            ->setFirstname('Nicolas')
+            ->setLastname('Chambon')
+            ->setPassword($this->hasher->hashPassword($admin, 'admin'))
+            ->setBirthdate(new DateTimeImmutable('1987-04-10'))
+            ->setCity('Sallanches')
+            ->setCreatedAt(new DateTimeImmutable())
+            ->setThumbnail('https://ca.slack-edge.com/T060RPZMDH6-U0619H5V5DG-7ee094234be2-512')
+            ->setIsVerified(true);
+        $manager->persist($admin);
         $manager->flush();
     }
 

@@ -66,6 +66,8 @@ class RegistrationController extends AbstractController
                 ->text('Cliquez sur ce lien pour vérifier votre adresse email : http://localhost:8000/api/users/verify/'.$verificationToken);
                 
             $mailer->send($email); // Send the email
+            // if email is not sent, try the following command in the terminal: 
+            // php bin/console messenger:consume async --time-limit=3600
 
             // Return a JSON response
             return $this->json([

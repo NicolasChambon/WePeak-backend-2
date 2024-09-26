@@ -15,11 +15,11 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activity.list', 'activity.detail'])]
+    #[Groups(['activity.list', 'activity.detail', 'user.detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['activity.list', 'activity.detail'])]
+    #[Groups(['activity.list', 'activity.detail', 'user.detail'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -27,7 +27,7 @@ class Activity
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['activity.list', 'activity.detail'])]
+    #[Groups(['activity.list', 'activity.detail', 'user.detail'])]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column]
@@ -53,7 +53,7 @@ class Activity
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['activity.list', 'activity.detail'])]
+    #[Groups(['activity.list', 'activity.detail', 'user.detail'])]
     private ?string $thumbnail = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'activitiesCreated')]
@@ -62,12 +62,12 @@ class Activity
     private ?User $createdBy = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['activity.list'])]
+    #[Groups(['activity.list', 'user.detail'])]
     private ?string $slug = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['activity.list', 'activity.detail'])]
+    #[Groups(['activity.list', 'activity.detail', 'user.detail'])]
     private ?Sport $sport = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
@@ -79,10 +79,8 @@ class Activity
     #[Groups(['activity.detail'])]
     private Collection $participations;
 
-    /**
-     * @var Collection<int, Pictures>
-     */
     #[ORM\OneToMany(targetEntity: Pictures::class, mappedBy: 'activity')]
+    #[Groups(['activity.detail'])]
     private Collection $pictures;
 
     public function __construct()

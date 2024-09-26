@@ -8,7 +8,6 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
@@ -18,42 +17,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activity.detail'])]
+    #[Groups(['activity.detail', 'user.detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50, unique: true)]
-    #[Groups(['activity.detail'])]
+    #[Groups(['activity.detail', 'user.detail'])]
     private ?string $pseudo = null;
 
     #[ORM\Column(length: 100)]
     private ?string $password = null;
-
+    
     #[ORM\Column(length: 100, unique: true)]
+    #[Groups(['user.detail'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['user.detail'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['user.detail'])]
     private ?string $lastname = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeImmutable $birthdate = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['user.detail'])]
     private ?string $city = null;
 
     #[ORM\Column]
+    #[Groups(['user.detail'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['activity.detail'])]
+    #[Groups(['activity.detail', 'user.detail'])]
     private ?string $thumbnail = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['user.detail'])]
     private ?string $description = null; 
 
     #[ORM\Column(type: Types::BOOLEAN)]
@@ -63,12 +68,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $verificationToken = null;
 
     #[ORM\OneToMany(targetEntity: Activity::class, mappedBy: 'createdBy', cascade: ['remove'])]
+    #[Groups(['user.detail'])]
     private Collection $activitiesCreated;
 
-    /**
-     * @var Collection<int, Participation>
-     */
     #[ORM\OneToMany(targetEntity: Participation::class, mappedBy: 'user')]
+    #[Groups(['user.detail'])]
     private Collection $participations;
 
     public function __construct()

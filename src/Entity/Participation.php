@@ -32,6 +32,7 @@ class Participation
 
     #[ORM\ManyToOne(inversedBy: 'participations')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['user.detail'])]
     private ?Activity $activity = null;
 
     public function getId(): ?int
