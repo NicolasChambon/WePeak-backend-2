@@ -13,21 +13,23 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activity.list'])]
+    #[Groups(['activity.list', 'activity.detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['activity.list'])]
+    #[Groups(['activity.list', 'activity.detail'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['activity.detail'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['activity.list'])]
+    #[Groups(['activity.list', 'activity.detail'])]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column]
+    #[Groups(['activity.detail'])]
     private ?int $groupSize = null;
 
     #[ORM\Column(length: 100)]
@@ -35,9 +37,11 @@ class Activity
     private ?string $city = null;
 
     #[ORM\Column]
+    #[Groups(['activity.detail'])]
     private ?float $lat = null;
 
     #[ORM\Column]
+    #[Groups(['activity.detail'])]
     private ?float $lng = null;
 
     #[ORM\Column]
@@ -47,11 +51,12 @@ class Activity
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['activity.list'])]
+    #[Groups(['activity.list', 'activity.detail'])]
     private ?string $thumbnail = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'activitiesCreated')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['activity.list', 'activity.detail'])]
     private ?User $createdBy = null;
 
     #[ORM\Column(length: 100)]
@@ -60,7 +65,7 @@ class Activity
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['activity.list'])]
+    #[Groups(['activity.list', 'activity.detail'])]
     private ?Sport $sport = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]

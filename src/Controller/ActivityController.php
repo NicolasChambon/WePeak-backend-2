@@ -4,8 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Activity;
 use App\Services\ActivityService;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,12 +18,17 @@ class ActivityController extends AbstractController
         $this->activityService = $activityService;
     }
     
-    // en requirement, on peut accepte des valeurs au format 45.9276288 pour les latitudes et longitudes
     #[Route('/page/{page}/{lat}/{lng}', name: 'closest_activities', methods: ['GET'])]
     public function listClosestActivities(int $page, string $lat, string $lng): JsonResponse
     {
         $activities = $this->activityService->getClosestActivities($page, $lat, $lng);
-        // dd('Hello');
+
         return $this->json($activities, 200, [], ['groups' => 'activity.list']);
+    }
+
+    #[Route('/{id}', name: 'activity_detail', methods: ['GET'])]
+    public function getActivityDetail(Activity $activity): JsonResponse
+    {
+        return $this->json($activity, 200, [], ['groups' => 'activity.detail']);
     }
 }

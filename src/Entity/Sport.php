@@ -17,7 +17,7 @@ class Sport
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['activity.list'])]
+    #[Groups(['activity.list', 'activity.detail'])]
     private ?string $name = null;
 
     #[ORM\Column]
