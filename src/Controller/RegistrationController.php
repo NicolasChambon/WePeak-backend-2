@@ -33,8 +33,37 @@ class RegistrationController extends AbstractController
         MailerInterface $mailer
         ): JsonResponse
     {
+        // Here we use a try/catch block to handle potential errors in email 
+        // sending or user creation
         try {
             $data = json_decode($request->getContent(), true);
+
+            // Check if one required data is missing
+            if (!isset($data['firstname']) || !isset($data['lastname']) || !isset($data['pseudo']) || !isset($data['email']) || !isset($data['city']) || !isset($data['birthdate']) || !isset($data['password'])) {
+                return $this->json([
+                    'message' => 'Missing required data.'
+                ], 400);
+            }
+
+            // Validate the email
+            if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                return $this->json([
+                    'message' => 'Invalid email.'
+                ], 400);
+            }
+
+            // Check if the email is already used
+            $user = $this->entityManager->getRepository(User::class)->findOneBy([
+                'email' => $data['email']
+            ]);
+            if ($user) {
+                return $this->json([
+                    'message' => 'Email already used.'
+                ], 400);
+            }
+
+            // and more accurate checks can be added here...
+
             $user = new User(); // Create a new User object
             
             // Set properties which non require any transformation
@@ -86,16 +115,19 @@ class RegistrationController extends AbstractController
         ): RedirectResponse
     {
         try {
+            // Find the user by the verification token
             $user = $this->entityManager->getRepository(User::class)->findOneBy([
                 'verificationToken' => $token
             ]);
             
+            // If the user is not found, return a 404 error
             if (!$user) {
                 return $this->json([
                     'message' => 'User not found.'
                 ], 404);
             }
     
+            // Set the user as verified and remove the verification token
             $user->setIsVerified(true);
             $user->setVerificationToken(null);
             $this->entityManager->flush();

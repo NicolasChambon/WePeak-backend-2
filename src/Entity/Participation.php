@@ -13,6 +13,7 @@ class Participation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['activity.detail', 'user.detail'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::BOOLEAN)]

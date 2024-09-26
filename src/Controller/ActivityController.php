@@ -11,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/api/activities', name: 'api_activity_')]
 class ActivityController extends AbstractController
 {
-    private $activityService;
+    private ActivityService $activityService;
     
     public function __construct(ActivityService $activityService)
     {
