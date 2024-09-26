@@ -35,7 +35,7 @@ class Activity
     private ?int $groupSize = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['activity.list'])]
+    #[Groups(['activity.list', 'user.detail'])]
     private ?string $city = null;
 
     #[ORM\Column]

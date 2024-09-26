@@ -75,10 +75,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user.detail'])]
     private Collection $participations;
 
+    #[ORM\ManyToMany(targetEntity: Sport::class, inversedBy: 'users')]
+    #[Groups(['user.detail'])]
+    private Collection $sports;
+
     public function __construct()
     {
         $this->activitiesCreated = new ArrayCollection();
         $this->participations = new ArrayCollection();
+        $this->sports = new ArrayCollection();
     }
 
     public function getRoles(): array
@@ -312,6 +317,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $participation->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Sport>
+     */
+    public function getSports(): Collection
+    {
+        return $this->sports;
+    }
+
+    public function addSport(Sport $sport): static
+    {
+        if (!$this->sports->contains($sport)) {
+            $this->sports->add($sport);
+        }
+
+        return $this;
+    }
+
+    public function removeSport(Sport $sport): static
+    {
+        $this->sports->removeElement($sport);
 
         return $this;
     }

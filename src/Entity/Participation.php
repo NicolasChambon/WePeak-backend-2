@@ -16,7 +16,7 @@ class Participation
     private ?int $id = null;
 
     #[ORM\Column(type: Types::BOOLEAN)]
-    #[Groups(['activity.detail'])]
+    #[Groups(['activity.detail', 'user.detail'])]
     private ?bool $status = false;
 
     #[ORM\Column]

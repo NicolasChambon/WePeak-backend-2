@@ -14,10 +14,11 @@ class Sport
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user.detail'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['activity.list', 'activity.detail'])]
+    #[Groups(['activity.list', 'activity.detail', 'user.detail'])]
     private ?string $name = null;
 
     #[ORM\Column]
@@ -26,22 +27,20 @@ class Sport
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    /**
-     * @var Collection<int, Activity>
-     */
     #[ORM\OneToMany(targetEntity: Activity::class, mappedBy: 'sport')]
     private Collection $activities;
 
-    /**
-     * @var Collection<int, Difficulty>
-     */
     #[ORM\OneToMany(targetEntity: Difficulty::class, mappedBy: 'sport')]
     private Collection $difficulties;
+
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'sports')]
+    private Collection $users;
 
     public function __construct()
     {
         $this->activities = new ArrayCollection();
         $this->difficulties = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -140,6 +139,33 @@ class Sport
             if ($difficulty->getSport() === $this) {
                 $difficulty->setSport(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->addSport($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        if ($this->users->removeElement($user)) {
+            $user->removeSport($this);
         }
 
         return $this;

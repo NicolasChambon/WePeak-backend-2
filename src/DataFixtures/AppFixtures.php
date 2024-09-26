@@ -19,8 +19,13 @@ class AppFixtures extends Fixture
 {
     private UserPasswordHasherInterface $hasher;
     private SluggerInterface $slugger;
-    private int $nbActivities = 100; // 100 activities
+
+    // private int $nbActivities = 10; // 10 activities
+    // private int $nbUsers = 10; // 10 users
+
+    private int $nbActivities = 300; // 300 activities
     private int $nbUsers = 300; // 300 users
+
 
     public function __construct(
         UserPasswordHasherInterface $hasher,
@@ -40,6 +45,7 @@ class AppFixtures extends Fixture
         $this->createAndLoadParticipations($manager);
         $this->createAndLoadPictures($manager);
         $this->loadAdmin($manager);
+        $this->attributeSportsToUsers($manager);
     }
 
     private function loadUsers(ObjectManager $manager): void
@@ -65,7 +71,7 @@ class AppFixtures extends Fixture
                 ->setPassword($this->hasher->hashPassword($user, $pseudo))
                 ->setBirthdate(new DateTimeImmutable($faker->dateTimeBetween('-50 years', '-18 years')->format('Y-m-d')))
                 ->setCity(array_rand($this->cities))
-                ->setCreatedAt(new DateTimeImmutable())
+                ->setCreatedAt(new DateTimeImmutable($faker->dateTimeBetween('-5 year', 'now')->format('Y-m-d')))
                 ->setThumbnail('https://loremflickr.com/320/240/people,face?random='.$faker->numberBetween(1, 100))
                 ->setIsVerified(true);
             $manager->persist($user);
@@ -268,6 +274,23 @@ class AppFixtures extends Fixture
                     ->setActivity($activity)
                     ->setCreatedAt(new DateTimeImmutable());
                 $manager->persist($picture);
+            }
+        }
+        $manager->flush();
+    }
+
+    private function attributeSportsToUsers(ObjectManager $manager): void
+    {
+        $faker = Factory::create('fr_FR');
+        $users = $manager->getRepository(User::class)->findAll();
+        $sports = $manager->getRepository(Sport::class)->findAll();
+
+        foreach ($users as $user) {
+            $numSports = rand(1, 3);
+            $userSports = $faker->randomElements($sports, $numSports);
+
+            foreach ($userSports as $userSport) {
+                $user->addSport($userSport);
             }
         }
         $manager->flush();
