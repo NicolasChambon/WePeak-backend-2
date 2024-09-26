@@ -79,9 +79,16 @@ class Activity
     #[Groups(['activity.detail'])]
     private Collection $participations;
 
+    /**
+     * @var Collection<int, Pictures>
+     */
+    #[ORM\OneToMany(targetEntity: Pictures::class, mappedBy: 'activity')]
+    private Collection $pictures;
+
     public function __construct()
     {
         $this->participations = new ArrayCollection();
+        $this->pictures = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -281,6 +288,36 @@ class Activity
             // set the owning side to null (unless already changed)
             if ($participation->getActivity() === $this) {
                 $participation->setActivity(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pictures>
+     */
+    public function getPictures(): Collection
+    {
+        return $this->pictures;
+    }
+
+    public function addPicture(Pictures $picture): static
+    {
+        if (!$this->pictures->contains($picture)) {
+            $this->pictures->add($picture);
+            $picture->setActivity($this);
+        }
+
+        return $this;
+    }
+
+    public function removePicture(Pictures $picture): static
+    {
+        if ($this->pictures->removeElement($picture)) {
+            // set the owning side to null (unless already changed)
+            if ($picture->getActivity() === $this) {
+                $picture->setActivity(null);
             }
         }
 

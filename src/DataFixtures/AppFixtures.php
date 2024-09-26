@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Entity\Sport;
 use DateTimeImmutable;
 use App\Entity\Activity;
+use App\Entity\Pictures;
 use App\Entity\Difficulty;
 use App\Entity\Participation;
 use Doctrine\Persistence\ObjectManager;
@@ -18,8 +19,13 @@ class AppFixtures extends Fixture
 {
     private UserPasswordHasherInterface $hasher;
     private SluggerInterface $slugger;
+    private int $nbActivities = 100; // 100 activities
+    private int $nbUsers = 300; // 300 users
 
-    public function __construct(UserPasswordHasherInterface $hasher, SluggerInterface $slugger)
+    public function __construct(
+        UserPasswordHasherInterface $hasher,
+        SluggerInterface $slugger
+        )
     {
         $this->hasher = $hasher;
         $this->slugger = $slugger;
@@ -32,6 +38,7 @@ class AppFixtures extends Fixture
         $this->loadDifficulties($manager);
         $this->createAndLoadActivities($manager);
         $this->createAndLoadParticipations($manager);
+        $this->createAndLoadPictures($manager);
     }
 
     private function loadUsers(ObjectManager $manager): void
@@ -39,7 +46,7 @@ class AppFixtures extends Fixture
 
         $faker =  Factory::create('fr_FR');
 
-        for ($i = 0; $i < 300; $i++) {
+        for ($i = 0; $i < $this->nbUsers; $i++) {
             
             $firstName = $faker->firstName();
             $lastName = str_replace(' ', '', $faker->lastName());
@@ -58,7 +65,7 @@ class AppFixtures extends Fixture
                 ->setBirthdate(new DateTimeImmutable($faker->dateTimeBetween('-50 years', '-18 years')->format('Y-m-d')))
                 ->setCity(array_rand($this->cities))
                 ->setCreatedAt(new DateTimeImmutable())
-                ->setThumbnail('https://loremflickr.com/320/240/portrait')
+                ->setThumbnail('https://loremflickr.com/320/240/people,face?random='.$faker->numberBetween(1, 100))
                 ->setIsVerified(true);
             $manager->persist($user);
         }
@@ -173,7 +180,7 @@ class AppFixtures extends Fixture
         $users = $manager->getRepository(User::class)->findAll();
         $sports = $manager->getRepository(Sport::class)->findAll();
 
-        for ($i = 0; $i < 300; $i++) {
+        for ($i = 0; $i < $this->nbActivities; $i++) {
             $city = array_rand($this->cities);
             $lat = $this->cities[$city]['latitude'];
             $lng = $this->cities[$city]['longitude'];
@@ -229,6 +236,24 @@ class AppFixtures extends Fixture
         $manager->flush();
     }
 
+    private function createAndLoadPictures(ObjectManager $manager): void
+    {
+        $faker = Factory::create('fr_FR');
+        $activities = $manager->getRepository(Activity::class)->findAll();
+
+        foreach ($activities as $activity) {
+            $numPictures = $faker->numberBetween(2, 5);
+
+            for ($i = 0; $i < $numPictures; $i++) {
+                $picture = new Pictures();
+                $picture->setLink('https://loremflickr.com/640/480/mountain?random='.$faker->numberBetween(1, 100))
+                    ->setActivity($activity)
+                    ->setCreatedAt(new DateTimeImmutable());
+                $manager->persist($picture);
+            }
+        }
+        $manager->flush();
+    }
 
     private array $cities = [
         'Albertville' => ['latitude' => 45.6758, 'longitude' => 6.3901],
