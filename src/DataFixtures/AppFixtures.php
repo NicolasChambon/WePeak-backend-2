@@ -37,7 +37,7 @@ class AppFixtures extends Fixture
 
         $faker =  Factory::create('fr_FR');
 
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 300; $i++) {
             
             $firstName = $faker->firstName();
             $lastName = str_replace(' ', '', $faker->lastName());
@@ -170,12 +170,15 @@ class AppFixtures extends Fixture
         $faker = Factory::create('fr_FR');
         $users = $manager->getRepository(User::class)->findAll();
         $sports = $manager->getRepository(Sport::class)->findAll();
-        $difficulties = $manager->getRepository(Difficulty::class)->findAll();
 
-        for ($i = 0; $i < 500; $i++) {
+        for ($i = 0; $i < 300; $i++) {
             $city = array_rand($this->cities);
             $lat = $this->cities[$city]['latitude'];
             $lng = $this->cities[$city]['longitude'];
+
+            $sport = $faker->randomElement($sports);
+            $difficulties = $manager->getRepository(Difficulty::class)->findBy(['sport' => $sport]);
+            $difficulty = $faker->randomElement($difficulties);
 
             $activity = new Activity();
             $activity->setName($faker->sentence(6))
@@ -187,10 +190,11 @@ class AppFixtures extends Fixture
                 ->setLng($lng)
                 ->setCreatedAt(new DateTimeImmutable())
                 ->setCreatedBy($faker->randomElement($users))
-                ->setSport($faker->randomElement($sports))
-                ->setDifficulty($faker->randomElement($difficulties))
+                ->setSport($sport)
+                ->setDifficulty($difficulty)
                 ->setSlug($this->slugger->slug($activity->getName())->lower())
-                ->setThumbnail('https://loremflickr.com/320/240/mountain');
+                ->setThumbnail('https://loremflickr.com/320/240/mountain?random='.$faker->numberBetween(1, 100));
+            
             $manager->persist($activity);
         }
         $manager->flush();
