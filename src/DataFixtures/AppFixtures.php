@@ -2,16 +2,17 @@
 
 namespace App\DataFixtures;
 
+use Faker\Factory;
+use App\Entity\User;
+use App\Entity\Sport;
+use DateTimeImmutable;
 use App\Entity\Activity;
 use App\Entity\Difficulty;
-use App\Entity\Sport;
-use App\Entity\User;
-use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use App\Entity\Participation;
 use Doctrine\Persistence\ObjectManager;
-use Faker\Factory;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
@@ -30,6 +31,7 @@ class AppFixtures extends Fixture
         $this->loadSports($manager);
         $this->loadDifficulties($manager);
         $this->createAndLoadActivities($manager);
+        $this->createAndLoadParticipations($manager);
     }
 
     private function loadUsers(ObjectManager $manager): void
@@ -199,6 +201,34 @@ class AppFixtures extends Fixture
         }
         $manager->flush();
     }
+
+    private function createAndLoadParticipations(ObjectManager $manager): void
+    {
+        $faker = Factory::create('fr_FR');
+        $activities = $manager->getRepository(Activity::class)->findAll();
+        $users = $manager->getRepository(User::class)->findAll();
+
+        foreach ($activities as $activity) {
+            $groupSize = $activity->getGroupSize();
+            $numParticipants = $faker->numberBetween(0, $groupSize);
+            $participants = $faker->randomElements($users, $numParticipants);
+
+            foreach ($participants as $participant) {
+                $isParticipating = $manager->getRepository(Participation::class)->findOneBy(['user' => $participant, 'activity' => $activity]);
+
+                if ($isParticipating === null) {
+                    $participation = new Participation();
+                    $participation->setUser($participant)
+                        ->setActivity($activity)
+                        ->setStatus($faker->numberBetween(0, 1))
+                        ->setCreatedAt(new DateTimeImmutable());
+                    $manager->persist($participation);
+                }
+            }
+        }
+        $manager->flush();
+    }
+
 
     private array $cities = [
         'Albertville' => ['latitude' => 45.6758, 'longitude' => 6.3901],

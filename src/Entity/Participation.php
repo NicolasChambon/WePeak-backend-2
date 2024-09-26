@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\ParticipationRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ParticipationRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ParticipationRepository::class)]
 class Participation
@@ -13,8 +15,9 @@ class Participation
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?bool $status = null;
+    #[ORM\Column(type: Types::BOOLEAN)]
+    #[Groups(['activity.detail'])]
+    private ?bool $status = false;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -24,6 +27,7 @@ class Participation
 
     #[ORM\ManyToOne(inversedBy: 'participations')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['activity.detail'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'participations')]

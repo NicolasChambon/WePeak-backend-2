@@ -75,10 +75,8 @@ class Activity
     #[Groups(['activity.list'])]
     private ?Difficulty $difficulty = null;
 
-    /**
-     * @var Collection<int, Participation>
-     */
     #[ORM\OneToMany(targetEntity: Participation::class, mappedBy: 'activity')]
+    #[Groups(['activity.detail'])]
     private Collection $participations;
 
     public function __construct()
